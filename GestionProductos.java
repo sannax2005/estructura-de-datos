@@ -1,14 +1,13 @@
-package GestionProductos;
+package Productos;
 
-
+import java.util.Arrays;
 import java.util.Scanner;
 
-class Producto {
+class Producto implements Comparable<Producto> {
     private String codigo;
     private String nombre;
     private double precio;
     private int cantidad;
-
 
     public Producto(String codigo, String nombre, double precio, int cantidad) {
         this.codigo = codigo;
@@ -16,7 +15,6 @@ class Producto {
         this.precio = precio;
         this.cantidad = cantidad;
     }
-
 
     public String getCodigo() {
         return codigo;
@@ -34,8 +32,8 @@ class Producto {
         return cantidad;
     }
 
-
-    public int compararPorPrecio(Producto otro) {
+    
+    public int compareTo(Producto otro) {
         return Double.compare(this.precio, otro.precio);
     }
 
@@ -43,55 +41,61 @@ class Producto {
         return Integer.compare(this.cantidad, otro.cantidad);
     }
 
-    @Override
+   
     public String toString() {
         return "Producto [codigo=" + codigo + ", nombre=" + nombre + ", precio=" + precio + ", cantidad=" + cantidad + "]";
     }
 }
 
-
-
 public class GestionProductos {
-	
-    private static Producto[] productos = new Producto[10]; 
+    private static Producto[] productos = new Producto[10];
     private static int contador = 0;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-      
         agregarProducto("P001", "Producto A", 10.5, 20);
         agregarProducto("P002", "Producto B", 20.5, 15);
         agregarProducto("P003", "Producto C", 15.0, 30);
 
-
         System.out.println("Productos iniciales:");
         mostrarProductos();
-
 
         System.out.println("\nOrdenando productos por precio (Burbuja):");
         ordenarPorPrecioBurbuja();
         mostrarProductos();
 
-
         System.out.println("\nOrdenando productos por cantidad (Inserción):");
         ordenarPorCantidadInsercion();
         mostrarProductos();
 
-  
-        System.out.println("\nBuscar producto por código:");
-        System.out.print("Ingrese el código del producto a buscar: ");
-        String codigoBuscar = scanner.nextLine();
-        Producto productoBuscado = buscarProductoPorCodigo(codigoBuscar);
-        if (productoBuscado != null) {
-            System.out.println("Producto encontrado: " + productoBuscado);
+        System.out.println("\nIngrese un nuevo producto:");
+        System.out.print("Código: ");
+        String codigo = scanner.nextLine();
+        System.out.print("Nombre: ");
+        String nombre = scanner.nextLine();
+        System.out.print("Precio: ");
+        double precio = scanner.nextDouble();
+        System.out.print("Cantidad: ");
+        int cantidad = scanner.nextInt();
+        scanner.nextLine(); 
+        agregarProducto(codigo, nombre, precio, cantidad);
+        
+        System.out.println("\nLista de productos actualizada:");
+        ordenarPorPrecioBurbuja();
+        mostrarProductos();
+
+        System.out.print("\nIngrese el precio del producto a buscar (búsqueda binaria): ");
+        double precioBuscar = scanner.nextDouble();
+        int indice = buscarProductoPorPrecio(precioBuscar);
+        if (indice >= 0) {
+            System.out.println("Producto encontrado: " + productos[indice]);
         } else {
             System.out.println("Producto no encontrado.");
         }
 
         scanner.close();
     }
-
 
     public static void agregarProducto(String codigo, String nombre, double precio, int cantidad) {
         if (contador < productos.length) {
@@ -102,28 +106,16 @@ public class GestionProductos {
         }
     }
 
-
-    public static Producto buscarProductoPorCodigo(String codigo) {
-        for (int i = 0; i < contador; i++) {
-            if (productos[i].getCodigo().equals(codigo)) {
-                return productos[i];
-            }
-        }
-        return null; 
-    }
-
-
     public static void mostrarProductos() {
         for (int i = 0; i < contador; i++) {
             System.out.println(productos[i]);
         }
     }
 
-
     public static void ordenarPorPrecioBurbuja() {
         for (int i = 0; i < contador - 1; i++) {
             for (int j = 0; j < contador - 1 - i; j++) {
-                if (productos[j].compararPorPrecio(productos[j + 1]) > 0) {
+                if (productos[j].compareTo(productos[j + 1]) > 0) {
                     Producto temp = productos[j];
                     productos[j] = productos[j + 1];
                     productos[j + 1] = temp;
@@ -131,7 +123,6 @@ public class GestionProductos {
             }
         }
     }
-
 
     public static void ordenarPorCantidadInsercion() {
         for (int i = 1; i < contador; i++) {
@@ -144,8 +135,9 @@ public class GestionProductos {
             productos[j + 1] = clave;
         }
     }
+
+    public static int buscarProductoPorPrecio(double precio) {
+        ordenarPorPrecioBurbuja();
+        return Arrays.binarySearch(productos, 0, contador, new Producto("", "", precio, 0));
+    }
 }
-
-
-
-
